@@ -7,8 +7,9 @@ const app = express();
 
 app.use(express.json());
 
+const mongouri = process.env.MONGO_URI;
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/loanapp', {
+mongoose.connect(mongouri ,  {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })

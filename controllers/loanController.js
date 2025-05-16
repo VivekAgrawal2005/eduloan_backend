@@ -15,9 +15,9 @@ exports.addLoan = async (req, res) => {
 exports.filterLoans = async (req, res) => {
   try {
     const { amount, max_interest, collateral } = req.query;
-
     const filter = {};
 
+    // Apply filters
     if (amount) {
       filter.loan_amount_min = { $lte: Number(amount) };
       filter.loan_amount_max = { $gte: Number(amount) };
@@ -30,7 +30,22 @@ exports.filterLoans = async (req, res) => {
     }
 
     const loans = await Loan.find(filter);
-    res.json(loans);
+
+    // Remove duplicates by loan_name
+    const uniqueLoansMap = new Map();
+    loans.forEach((loan) => {
+      if (!uniqueLoansMap.has(loan.loan_name)) {
+        uniqueLoansMap.set(loan.loan_name, {
+          name: loan.bank_name,
+          loan_name: loan.loan_name,
+          interest_rate: loan.interest_rate,
+          id: loan._id,
+        });
+      }
+    });
+
+    const response = Array.from(uniqueLoansMap.values());
+    res.json(response);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -46,4 +61,3 @@ exports.getLoanById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
