@@ -1,14 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const loanController = require('../controllers/loanController');
+const emiController = require('../controllers/emiController');
+
+// Add new loan
+router.post('/add', loanController.addLoan);
 
 // Filter loans
-router.post('/filter', loanController.filterLoans);
+router.get('/filter', loanController.filterLoans);
 
-// Compare loans
-router.post('/compare', loanController.compareLoans);
+// Get loan details by id
+router.get('/:id', loanController.getLoanById);
 
-// Get loan details
-router.get('/:id', loanController.getLoanDetails);
+// Calculate EMI
+router.post('/calculate-emi', emiController.calculateEMI);
 
 module.exports = router;

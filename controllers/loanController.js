@@ -1,23 +1,49 @@
-const loans = require('../data/loans.json');
+const Loan = require('../Models/loanmodel');
 
-exports.filterLoans = (req, res) => {
-    const { amount, maxInterest, collateral } = req.body;
-    const filtered = loans.filter(loan =>
-        loan.amount >= amount &&
-        loan.interest <= maxInterest &&
-        loan.collateral.toLowerCase().includes(collateral.toLowerCase())
-    );
-    res.json(filtered);
+// Add new loan
+exports.addLoan = async (req, res) => {
+  try {
+    const loan = new Loan(req.body);
+    await loan.save();
+    res.status(201).json({ message: 'Loan added successfully', loan });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
-exports.compareLoans = (req, res) => {
-    const { ids } = req.body;
-    const compared = loans.filter(loan => ids.includes(loan.id));
-    res.json(compared);
+// Filter loans based on user criteria
+exports.filterLoans = async (req, res) => {
+  try {
+    const { amount, max_interest, collateral } = req.query;
+
+    const filter = {};
+
+    if (amount) {
+      filter.loan_amount_min = { $lte: Number(amount) };
+      filter.loan_amount_max = { $gte: Number(amount) };
+    }
+    if (max_interest) {
+      filter.interest_rate = { $lte: Number(max_interest) };
+    }
+    if (collateral && (collateral === 'Yes' || collateral === 'No')) {
+      filter.collateral_required = collateral;
+    }
+
+    const loans = await Loan.find(filter);
+    res.json(loans);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-exports.getLoanDetails = (req, res) => {
-    const loan = loans.find(l => l.id === req.params.id);
-    if (!loan) return res.status(404).json({ error: 'Loan not found' });
+// Get loan by ID (for details or comparison)
+exports.getLoanById = async (req, res) => {
+  try {
+    const loan = await Loan.findById(req.params.id);
+    if (!loan) return res.status(404).json({ message: 'Loan not found' });
     res.json(loan);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+

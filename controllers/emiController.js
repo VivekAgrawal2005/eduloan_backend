@@ -1,17 +1,41 @@
+// Calculate EMI, total interest, total payment
 exports.calculateEMI = (req, res) => {
-    const { amount, interest, duration } = req.body;
+  try {
+    const { loanAmount, interestRate, repaymentYears } = req.body;
 
-    const P = parseFloat(amount);
-    const R = parseFloat(interest) / 12 / 100;
-    const N = parseFloat(duration) * 12;
+    if (
+      !loanAmount ||
+      !interestRate ||
+      !repaymentYears ||
+      loanAmount <= 0 ||
+      interestRate < 0 ||
+      repaymentYears <= 0
+    ) {
+      return res.status(400).json({ message: 'Invalid input values' });
+    }
 
-    const emi = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
-    const totalPayment = emi * N;
-    const totalInterest = totalPayment - P;
+    const P = parseFloat(loanAmount);
+    const R = parseFloat(interestRate) / 12 / 100;
+    const N = parseFloat(repaymentYears) * 12;
+
+    let EMI;
+
+    if (R === 0) {
+      EMI = P / N;
+    } else {
+      EMI = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+    }
+
+    EMI = parseFloat(EMI.toFixed(2));
+    const totalPayment = parseFloat((EMI * N).toFixed(2));
+    const totalInterest = parseFloat((totalPayment - P).toFixed(2));
 
     res.json({
-        monthlyEMI: emi.toFixed(2),
-        totalInterest: totalInterest.toFixed(2),
-        totalPayment: totalPayment.toFixed(2)
+      monthlyEMI: EMI,
+      totalInterest,
+      totalPayment
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

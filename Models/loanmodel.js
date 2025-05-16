@@ -1,63 +1,66 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const loanSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
   bank_name: {
     type: String,
-    required: true
+    required: true,
   },
   loan_name: {
     type: String,
-    required: true
+    required: true,
   },
   loan_type: {
     type: String,
-    required: true
+    required: true,
   },
   interest_rate: {
     type: Number,
-    required: true
+    required: true,
   },
   eligibility: {
     type: String,
-    required: true
+    required: true,
   },
   loan_amount_min: {
     type: Number,
-    required: true
+    required: true,
   },
   loan_amount_max: {
     type: Number,
-    required: true
+    required: true,
   },
   collateral_required: {
     type: String,
-    enum: ['Yes', 'No'],
-    required: true
+    enum: ["Yes", "No"],
+    required: true,
   },
   processing_fee: {
     type: String,
-    required: true
+    required: true,
   },
-  moratorium_period: {
+  moratorium_period_months: {
     type: Number,
-    required: true
+    required: true,
   },
-  min_repayment_duration: {
+  min_repayment_duration_years: {
     type: Number,
-    required: true
+    required: true,
   },
-  max_repayment_duration: {
+  max_repayment_duration_years: {
     type: Number,
-    required: true
+    required: true,
   },
   concessions: {
     type: String,
-    default: 'None'
   },
   additional_notes: {
     type: String,
-    default: ''
   }
-}, { timestamps: true });
+});
 
-module.exports = mongoose.model('LoanAllDetails', loanSchema);
+module.exports = mongoose.model("Loan", loanSchema);
