@@ -14,5 +14,8 @@ router.get('/:id', loanController.getLoanById);
 
 // Calculate EMI
 router.post('/calculate-emi', emiController.calculateEMI);
+//gernerate the pdf 
+router.post('/:id/emi-report-pdf', emiController.downloadEmiPdf);
+
 
 module.exports = router;
